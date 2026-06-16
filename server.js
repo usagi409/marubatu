@@ -2,12 +2,14 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 
-// Googleドライブ等（別ドメイン）からHTMLを開いても接続を受け付ける設定
+// ⭕ 外（ローカルファイル）からの接続を許可する設定を追加
 const io = require('socket.io')(http, {
     cors: {
         origin: "*"
     }
 });
+
+app.use(express.static('public'));
 
 const rooms = {};
 
@@ -20,6 +22,7 @@ function checkWinner(board) {
 }
 
 io.on('connection', (socket) => {
+    // 部屋作成（重複チェック付き）
     socket.on('create-room', ({ userName }) => {
         let roomId;
         do {
